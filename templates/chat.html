@@ -1,0 +1,48 @@
+<html>
+<head>
+  <title>Chat</title>
+  <style>
+    input { display: block; }
+    ul { list-style: none; }
+  </style>
+</head>
+<body>
+  <h1>Let's chat</h1>
+  <ul id="messages">
+
+  </ul>
+  <form id="chat_box">
+    <textarea></textarea>
+    <input type="submit" value="送信">
+  </form>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script>
+    $(function () {
+      var socket = null;
+      var msg_box = $("#chat_box textarea");
+      var message = $("#messages");
+      $("#chat_box").submit(function () {
+        if(!msg_box.val()) return false;
+        if(!socket) {
+          alert("エラー");
+          return false;
+        }
+        socket.send(msg_box.val());
+        msg_box.val("");
+        return false;
+      });
+      if(!window["WebSocket"]){
+        alert("エラー");
+      }else{
+        socket = new WebSocket("ws://{{.Host}}/room");
+        socket.onclose = function () {
+          alert("エラー");
+        };
+        socket.onmessage = function (e) {
+          message.append($("<li>").text(e.data));
+        };
+      }
+    });
+  </script>
+</body>
+</html>
